@@ -73,7 +73,8 @@ class DStream(object):
     def mapPartitions(self, f):
         """
         """
-        def func(s, iterator): return f(iterator)
+        #def func(s, iterator): return f(iterator)
+        func = RDDFunctions.mapPartiions(f)
         return self.mapPartitionsWithIndex(func)
 
     def reduce(self, func, numPartitions=None):
@@ -83,7 +84,7 @@ class DStream(object):
         return self.combineByKey(lambda x:x, func, func, numPartitions)
 
     def combineByKey(self, createCombiner, mergeValue, mergeCombiners,
-                      numPartitions = None):
+                     numPartitions = None):
         """
         """
         if numPartitions is None:

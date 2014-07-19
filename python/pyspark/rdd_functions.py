@@ -33,3 +33,8 @@ class RDDFunctions(object):
     def filter(f):
         def func(iterator): return ifilter(f, iterator)
         return func
+    @staticmethod
+    def mapPartiions(f):
+        def func(s, iterator): return f(iterator)
+        return func
+
