@@ -54,7 +54,7 @@ class DStream(object):
     def filter(self, f):
         """
         """
-        def func(iterator): return ifilter(f, iterator)
+        func = RDDFunctions.filter(f)
         return self.mapPartitions(func)
 
     def flatMap(self, f, preservesPartitioning=False):

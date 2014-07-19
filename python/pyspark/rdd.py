@@ -42,6 +42,7 @@ from pyspark.statcounter import StatCounter
 from pyspark.rddsampler import RDDSampler
 from pyspark.storagelevel import StorageLevel
 from pyspark.resultiterable import ResultIterable
+from pyspark.rdd_functions import RDDFunctions
 
 from py4j.java_collections import ListConverter, MapConverter
 
@@ -257,7 +258,8 @@ class RDD(object):
         >>> sorted(rdd.map(lambda x: (x, 1)).collect())
         [('a', 1), ('b', 1), ('c', 1)]
         """
-        def func(split, iterator): return imap(f, iterator)
+        #def func(split, iterator): return imap(f, iterator)
+        func = RDDFunctions.map(f)
         return PipelinedRDD(self, func, preservesPartitioning)
 
     def flatMap(self, f, preservesPartitioning=False):
@@ -271,7 +273,8 @@ class RDD(object):
         >>> sorted(rdd.flatMap(lambda x: [(x, x), (x, x)]).collect())
         [(2, 2), (2, 2), (3, 3), (3, 3), (4, 4), (4, 4)]
         """
-        def func(s, iterator): return chain.from_iterable(imap(f, iterator))
+        #def func(s, iterator): return chain.from_iterable(imap(f, iterator))
+        func = RDDFunctions.flatMap(f)
         return self.mapPartitionsWithIndex(func, preservesPartitioning)
 
     def mapPartitions(self, f, preservesPartitioning=False):
@@ -315,13 +318,13 @@ class RDD(object):
         return self.mapPartitionsWithIndex(f, preservesPartitioning)
 
     def getNumPartitions(self):
-      """
-      Returns the number of partitions in RDD
-      >>> rdd = sc.parallelize([1, 2, 3, 4], 2)
-      >>> rdd.getNumPartitions()
-      2
-      """
-      return self._jrdd.partitions().size()
+        """
+        Returns the number of partitions in RDD
+        >>> rdd = sc.parallelize([1, 2, 3, 4], 2)
+        >>> rdd.getNumPartitions()
+        2
+        """
+        return self._jrdd.partitions().size()
 
     def filter(self, f):
         """
@@ -331,7 +334,8 @@ class RDD(object):
         >>> rdd.filter(lambda x: x % 2 == 0).collect()
         [2, 4]
         """
-        def func(iterator): return ifilter(f, iterator)
+        #def func(iterator): return ifilter(f, iterator)
+        func = RDDFunctions.filter(f)
         return self.mapPartitions(func)
 
     def distinct(self):
