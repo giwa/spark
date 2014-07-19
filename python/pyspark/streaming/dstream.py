@@ -7,6 +7,7 @@ import logging
 from pyspark.serializers import NoOpSerializer,\
     BatchedSerializer, CloudPickleSerializer, pack_long
 from pyspark.rdd import _JavaStackTrace
+from pyspark.rdd_functions import RDDFunctions
 
 from py4j.java_collections import ListConverter, MapConverter
 
@@ -59,13 +60,14 @@ class DStream(object):
     def flatMap(self, f, preservesPartitioning=False):
         """
         """
-        def func(s, iterator): return chain.from_iterable(imap(f, iterator))
+        #def func(s, iterator): return chain.from_iterable(imap(f, iterator))
+        func = RDDFunctions.flatMap(f)
         return self.mapPartitionsWithIndex(func, preservesPartitioning)
 
     def map(self, f, preservesPartitioning=False):
         """
         """
-        def func(split, iterator): return imap(f, iterator)
+        func = RDDFunctions.map(f)
         return PipelinedDStream(self, func, preservesPartitioning)
 
     def mapPartitions(self, f):
